@@ -130,28 +130,35 @@
         # else:
         #     return False
         
-matr = [[(150, 200), (325, 200), (500, 200)],
-        [(200, 250), (325, 250), (450, 250)],
-        [(250, 300), (325, 300), (400, 300)],
-        [(150, 375), (200, 375), (250, 375)],
-        [(400, 375), (450, 375), (500, 375)],
-        [(250, 450), (325, 450), (400, 450)],
-        [(200, 500), (325, 500), (450, 500)],
-        [(150, 550), (325, 550), (500, 550)]]
+# matr = [[(150, 200), (325, 200), (500, 200)],
+#         [(200, 250), (325, 250), (450, 250)],
+#         [(250, 300), (325, 300), (400, 300)],
+#         [(150, 375), (200, 375), (250, 375)],
+#         [(400, 375), (450, 375), (500, 375)],
+#         [(250, 450), (325, 450), (400, 450)],
+#         [(200, 500), (325, 500), (450, 500)],
+#         [(150, 550), (325, 550), (500, 550)]]
 
-aped = [1,2,3,4,5,6,7,8,9]
-contenedor = []
+# aped = [1,2,3,4,5,6,7,8,9]
+# contenedor = []
 
-cambio = 0
-indice = aped[cambio]
+# cambio = 0
+# indice = aped[cambio]
 
-for y in range(1, len(aped)+1):
-    for i in range(1, len(aped)+1):
-        for e in range(1, len(aped)+1):
-            if y != i and y != e and i != e:
-                contenedor.append([y, i, e])
+# for y in range(1, len(aped)+1):
+#     for i in range(1, len(aped)+1):
+#         for e in range(1, len(aped)+1):
+#             if y != i and y != e and i != e:
+#                 contenedor.append([y, i, e])
             
 
-for parte in contenedor:
-    print(parte)
-print(len(contenedor))
+# for parte in contenedor:
+#     print(parte)
+# print(len(contenedor))
+import random
+
+asd = ["sd","gg",1,5,7,"/"]
+
+print(random.choice(asd))
+
+# print(asd)
