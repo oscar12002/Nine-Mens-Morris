@@ -109,7 +109,7 @@ class Files(pygame.sprite.Sprite):
         self.image_file = pygame.image.load(file_image)
         self.image_file = pygame.transform.scale(self.image_file, (35, 35))
         
-        self.file_quantly = 5
+        self.file_quantly = 9
         
         self.file_list = []
     
@@ -139,8 +139,6 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, list_of_instances, file_object, screem):
         pygame.sprite.Sprite.__init__(self)
         
-        self.screem = screem
-        
         self.my_files = file_object
         
         self.list_of_instances = list_of_instances
@@ -159,12 +157,11 @@ class Player(pygame.sprite.Sprite):
         self.content_mills = []
         self.content_mills_position = []
         
-        self.cont_files = 9
-        self.cont_files_2 = 9
-        
         self.indice = True
         
-        self.klk = 0
+        self.rest_num_to_file = 0
+        
+        self.file_limited = 9
     
 
     def eliminate(self):
@@ -198,7 +195,7 @@ class Player(pygame.sprite.Sprite):
         for e in range(len(self.content_mills_position)):
             for confirm in matr:
                 if self.content_mills_position[e] == confirm:
-                    if not self.content_mills[e][0][2] and not self.content_mills[e][1][2] and not self.content_mills[e][2][2]:
+                    if not self.content_mills[e][0][2] or not self.content_mills[e][1][2] or not self.content_mills[e][2][2]:
                         self.indice = self.content_mills[e]
                         
                         self.content_mills[e][0][3] = cont
@@ -214,7 +211,7 @@ class Player(pygame.sprite.Sprite):
     
     def put_file(self, event, position_verify, x, y):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            file = self.list_of_files[self.turn_put_file - self.klk]
+            file = self.list_of_files[self.turn_put_file - self.rest_num_to_file]
             for instance in self.list_of_instances:
                 if instance[1].collidepoint(x, y):
                     
@@ -253,10 +250,27 @@ class Player(pygame.sprite.Sprite):
     
     
     def move_file(self, event, position_verify, x, y):
+        three_files = True
+        if self.file_limited == 3:
+            three_files = False
+            
         if event.type == pygame.MOUSEBUTTONDOWN:
             for instance in self.list_of_instances:
                 if instance[1].collidepoint(x, y):
-                    if self.__move_restrintion(instance, instance[1].x, instance[1].y):
+                    if three_files:
+                        if self.__move_restrintion(instance, instance[1].x, instance[1].y):
+                            if position_verify:
+                                self.my_files.move(self.file_select_to_move, instance)
+                                self.turn_move_file += 1
+                                
+                                for file in self.list_of_files:
+                                    if file[3] == self.file_select_to_move[3]:
+                                        file[2] = []
+                                
+                                self.file_select_to_move = []
+                                self.position_from_file_select = []
+                                break
+                    else:
                         if position_verify:
                             self.my_files.move(self.file_select_to_move, instance)
                             self.turn_move_file += 1
@@ -281,13 +295,14 @@ class Game:
         self.file_white = pygame.image.load("images/white_file.png")
         self.file_white = pygame.transform.scale(self.file_white, (35, 35))
         
+        self.background = pygame.image.load("images/background.jpg")
+        
         
         self.mouse_pos_x = 0
         self.mouse_pos_y = 0
         
         self.screem = screem
 
-        self.almacen = 0
 
     def __get_click_position(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -307,7 +322,7 @@ class Game:
                 
         return True
 
-    def select_file(self, event, player, player_me):
+    def __select_file_to_delete(self, event, player, player_me):
         self.__get_click_position(event)
         for f in player_me.list_of_files:
             print(f[2])
@@ -321,7 +336,8 @@ class Game:
                     player_me.indice[1][2].append(1)
                     player_me.indice[2][2].append(1)
                     
-                    player.klk += 1
+                    player.rest_num_to_file += 1
+                    player.file_limited -= 1
                     
                     if (self.player_one.cont_turn_put_file < self.player_one.my_files.file_quantly) or (self.player_two.cont_turn_put_file < self.player_two.my_files.file_quantly):
                         self.player_one.cont_turn_put_file = self.player_one.turn_put_file
@@ -338,7 +354,8 @@ class Game:
             self.player_one.put_file(event, self.__verify_position(event), self.mouse_pos_x, self.mouse_pos_y)            
             
             if self.player_one.eliminate():
-                self.select_file(event, self.player_two, self.player_one)
+                self.__eliminate_indication()
+                self.__select_file_to_delete(event, self.player_two, self.player_one)
             else:
                 self.player_one.cont_turn_put_file = self.player_one.turn_put_file
             
@@ -349,7 +366,8 @@ class Game:
             self.player_two.put_file(event, self.__verify_position(event), self.mouse_pos_x, self.mouse_pos_y)
             
             if self.player_two.eliminate():
-                self.select_file(event, self.player_one, self.player_two)
+                self.__eliminate_indication()
+                self.__select_file_to_delete(event, self.player_one, self.player_two)
             else:
                 self.player_two.cont_turn_put_file = self.player_two.turn_put_file
 
@@ -367,7 +385,8 @@ class Game:
                 self.player_one.move_file(event, self.__verify_position(event), self.mouse_pos_x, self.mouse_pos_y)
                 
                 if self.player_one.eliminate():
-                    self.select_file(event, self.player_two, self.player_one)
+                    self.__eliminate_indication()
+                    self.__select_file_to_delete(event, self.player_two, self.player_one)
                 else:
                     self.player_one.cont_turn_move_file = self.player_one.turn_move_file
             
@@ -383,7 +402,8 @@ class Game:
                 self.player_two.move_file(event, self.__verify_position(event), self.mouse_pos_x, self.mouse_pos_y)
                 
                 if self.player_two.eliminate():
-                    self.select_file(event, self.player_one, self.player_two)
+                    self.__eliminate_indication()
+                    self.__select_file_to_delete(event, self.player_one, self.player_two)
                 else:
                     self.player_two.cont_turn_move_file = self.player_two.turn_move_file
     
@@ -408,21 +428,44 @@ class Game:
         
         self.screem.blit(text_player, (x, 120))
     
+    def __eliminate_indication(self):
+        font = pygame.font.Font(None, 45)
+        text_player = font.render("select file to eliminate", 0, (0, 0, 255))
+        
+        self.screem.blit(text_player, (160, 650))
+    
+    def __last_scene(self, winner):
+        self.screem.blit(self.background, (0, 0))
+        
+        font = pygame.font.Font(None, 50)
+        text_end = font.render("THE GAME FINISHED", 0, (255, 255, 25))
+        
+        text_player = font.render(winner, 0, (0, 0, 0))
+        
+        self.screem.blit(text_end, (130, 100))
+        
+        self.screem.blit(text_player, (170, 250))
+    
     
     def start(self, event):
         if (self.player_one.cont_turn_put_file < self.player_one.my_files.file_quantly) or (self.player_two.cont_turn_put_file < self.player_two.my_files.file_quantly):
             self.__print_instructions("Set your file on the board", 140)       
             self.__turn_put_file(event)
             
-            
         else:
             self.__print_instructions("Move your file to create a Mill", 110)
             self.__turn_move_file(event)
 
+        if self.player_one.file_limited == 2:
+            self.__last_scene("PLAYER 2 WIM")
+            
+        elif self.player_two.file_limited == 2:
+            self.__last_scene("PLAYER 1 WIM")
 
 def close():
     pygame.quit()
     sys.exit()
+
 
 screem = pygame.display.set_mode((650, 700))
 def main():
@@ -458,14 +501,9 @@ def main():
         event = pygame.event.wait()
         if event.type == QUIT:
             close()
-                
+        
         game.start(event)
-        
-        
-        
-        
-        
-        
+
         pygame.display.update()
 
 
