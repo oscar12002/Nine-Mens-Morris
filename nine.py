@@ -109,7 +109,7 @@ class Files(pygame.sprite.Sprite):
         self.image_file = pygame.image.load(file_image)
         self.image_file = pygame.transform.scale(self.image_file, (35, 35))
         
-        self.file_quantly = 4
+        self.file_quantly = 5
         
         self.file_list = []
     
@@ -118,7 +118,7 @@ class Files(pygame.sprite.Sprite):
         posY = 210
         for i in range(self.file_quantly):
             file_rect = self.image_file.get_rect(center=(self.first_pos_x, posY))
-            self.file_list.append([self.image_file, file_rect, []])
+            self.file_list.append([self.image_file, file_rect, [], []])
             posY += 40
     
     
@@ -186,6 +186,8 @@ class Player(pygame.sprite.Sprite):
                 [(450, 250), (450, 375), (450, 500)],
                 [(500, 200), (500, 375), (500, 550)]]
         
+        cont = 0
+        
         for first_file in self.list_of_files:
             for second_file in self.list_of_files:
                 for thirth_file in self.list_of_files:
@@ -196,8 +198,17 @@ class Player(pygame.sprite.Sprite):
         for e in range(len(self.content_mills_position)):
             for confirm in matr:
                 if self.content_mills_position[e] == confirm:
-                    if self.content_mills[e][0][2] != [1] and self.content_mills[e][1][2] != [1] and self.content_mills[e][2][2] != [1]:
+                    if not self.content_mills[e][0][2] and not self.content_mills[e][1][2] and not self.content_mills[e][2][2]:
                         self.indice = self.content_mills[e]
+                        
+                        self.content_mills[e][0][3] = cont
+                        self.content_mills[e][1][3] = cont
+                        self.content_mills[e][2][3] = cont
+                        
+                        cont += 1
+                        
+                        self.content_mills_position = []
+                        self.content_mills = []
                         return True
     
     
@@ -218,7 +229,7 @@ class Player(pygame.sprite.Sprite):
         if event.type == pygame.MOUSEBUTTONDOWN:
             for file_select in self.list_of_files:
                 if file_select[1].collidepoint(x, y):
-                    self.file_select_to_move = file_select                                                                
+                    self.file_select_to_move = file_select
                     
                     for instance in self.list_of_instances:
                         if instance[1].collidepoint(x, y):
@@ -229,13 +240,14 @@ class Player(pygame.sprite.Sprite):
     
     def __move_restrintion(self, instance, x, y):
         for position_aviable in instance[2]:
-            if self.position_from_file_select[0] + position_aviable == x or self.position_from_file_select[0] - position_aviable == x:
-                if self.position_from_file_select[1] == y:
-                    return True
-                
-            elif self.position_from_file_select[1] + position_aviable == y or self.position_from_file_select[1] - position_aviable == y: 
-                if self.position_from_file_select[0] == x:
-                    return True
+            if self.position_from_file_select:
+                if self.position_from_file_select[0] + position_aviable == x or self.position_from_file_select[0] - position_aviable == x:
+                    if self.position_from_file_select[1] == y:
+                        return True
+                    
+                elif self.position_from_file_select[1] + position_aviable == y or self.position_from_file_select[1] - position_aviable == y: 
+                    if self.position_from_file_select[0] == x:
+                        return True
                 
         return False
     
@@ -248,6 +260,10 @@ class Player(pygame.sprite.Sprite):
                         if position_verify:
                             self.my_files.move(self.file_select_to_move, instance)
                             self.turn_move_file += 1
+                            
+                            for file in self.list_of_files:
+                                if file[3] == self.file_select_to_move[3]:
+                                    file[2] = []
                             
                             self.file_select_to_move = []
                             self.position_from_file_select = []
@@ -293,19 +309,21 @@ class Game:
 
     def select_file(self, event, player, player_me):
         self.__get_click_position(event)
+        for f in player_me.list_of_files:
+            print(f[2])
         
         for file in player.list_of_files:
             if file[1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
-                if file[2] != [1]:
+                if not file[2]:
                     player.list_of_files.remove(file)                    
                     
-                    player_me.indice[0][2] = [1]
-                    player_me.indice[1][2] = [1]
-                    player_me.indice[2][2] = [1]
+                    player_me.indice[0][2].append(1)
+                    player_me.indice[1][2].append(1)
+                    player_me.indice[2][2].append(1)
                     
                     player.klk += 1
                     
-                    if (self.player_one.cont_turn_put_file < 4) or (self.player_two.cont_turn_put_file < 4):
+                    if (self.player_one.cont_turn_put_file < self.player_one.my_files.file_quantly) or (self.player_two.cont_turn_put_file < self.player_two.my_files.file_quantly):
                         self.player_one.cont_turn_put_file = self.player_one.turn_put_file
                     else:
                         self.player_one.cont_turn_move_file = self.player_one.turn_move_file
@@ -392,7 +410,7 @@ class Game:
     
     
     def start(self, event):
-        if (self.player_one.cont_turn_put_file < 4) or (self.player_two.cont_turn_put_file < 4):
+        if (self.player_one.cont_turn_put_file < self.player_one.my_files.file_quantly) or (self.player_two.cont_turn_put_file < self.player_two.my_files.file_quantly):
             self.__print_instructions("Set your file on the board", 140)       
             self.__turn_put_file(event)
             
