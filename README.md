@@ -1,4 +1,5 @@
-#Nine Mens Morris
+
+<h1>Nine Mens Morris</h1>
 
 ------------
 
@@ -10,19 +11,19 @@ Nine mens morris is a strategy board game for two players dating at least to the
 ------------
 
 
-####Instalation:
+<h4>Instalation:</h4>
 
 For it can be runned you must have at least "python 3.0" installed and the library "pygame", which you can install with the next command in the bash of your code editor:
 
 *pip install pygame*
 
 
-####Rules of game:
+<h4>Rules of game:</h4>
 
 The rules of this game are a little bit extensives, so if you want know all de reules necesaries to play go [Here.](https://en.wikipedia.org/wiki/Nine_men%27s_morris#Rules "Here") 
 
 
-####How to run:
+<h4>How to run:</h4>
 
 First download the archive complete, then ejecute the next command in your bash:
 
