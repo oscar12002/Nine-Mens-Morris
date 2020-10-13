@@ -29,37 +29,40 @@ class Game:
     def __verify_position(self, event):
         self.__get_click_position(event)
         for white_file in self.player_one.list_of_files:
-            if white_file[1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
-                return False
+            if white_file != []:
+                if white_file[1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
+                    return False
                 
-        for black_file in self.player_two.list_of_files:                
-            if black_file[1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
-                return False
+        for black_file in self.player_two.list_of_files:  
+            if black_file != []:
+                if black_file[1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
+                    return False
                 
         return True
 
     def __select_file_to_delete(self, event, player, player_me):
         self.__get_click_position(event)
-        for f in player_me.list_of_files:
-            print(f[2])
-        
-        for file in player.list_of_files:
-            if file[1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
-                if not file[2]:
-                    player.list_of_files.remove(file)                    
-                    
-                    player_me.transport_mills[0][2].append(1)
-                    player_me.transport_mills[1][2].append(1)
-                    player_me.transport_mills[2][2].append(1)
-                    
-                    player.rest_num_to_file += 1
-                    player.file_limited -= 1
-                    
-                    if (self.player_one.cont_turn_put_file < self.player_one.my_files.file_quantly) or (self.player_two.cont_turn_put_file < self.player_two.my_files.file_quantly):
-                        self.player_one.cont_turn_put_file = self.player_one.turn_put_file
-                    else:
-                        self.player_one.cont_turn_move_file = self.player_one.turn_move_file
-                    break
+
+        player_me.boolean_verify = False
+        for i in range(len(player.list_of_files)):
+            if player.list_of_files[i] != []:
+                if player.list_of_files[i][1].collidepoint(self.mouse_pos_x, self.mouse_pos_y):
+                    # if not player.list_of_files[i][2]:
+                        player.list_of_files[i] = []                    
+                        
+                        player_me.boolean_verify = True
+                        
+                        player_me.transport_mills[0][2].append(1)
+                        player_me.transport_mills[1][2].append(1)
+                        player_me.transport_mills[2][2].append(1)
+                        
+                        player.file_limited -= 1
+                        
+                        if (self.player_one.cont_turn_put_file < self.player_one.my_files.file_quantly) or (self.player_two.cont_turn_put_file < self.player_two.my_files.file_quantly):
+                            self.player_one.cont_turn_put_file = self.player_one.turn_put_file
+                        else:
+                            self.player_one.cont_turn_move_file = self.player_one.turn_move_file
+                        break
 
 
     def __turn_put_file(self, event):

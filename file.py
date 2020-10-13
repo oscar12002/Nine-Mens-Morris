@@ -19,8 +19,7 @@ class Files(pygame.sprite.Sprite):
         for i in range(self.file_quantly):
             file_rect = self.image_file.get_rect(center=(self.first_pos_x, posY))
             # the array in thirth position store a number to know then this file is in a mill
-            # the array in fourth position is changed for a number to identify the three files that are in the same mill
-            self.file_list.append([self.image_file, file_rect, [], []])
+            self.file_list.append([self.image_file, file_rect, []])
             posY += 40
     
     
